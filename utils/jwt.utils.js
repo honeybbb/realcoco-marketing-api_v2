@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const SECURITY_KEY = '28XttuCMEpRnVSFvsovQ';
 const EXPIRED_TIME = 1000 * 60 * 60 * 3;
-/*
+
 const createHeader = () => {
     return { typ: 'JWT', alg: 'HS256' };
 };
-
+/*
 const createClaims = (member) => {
     // `toMemberJwtClaims` 함수가 JavaScript 객체의 메소드로 존재해야 합니다.
     const memberJwtClaims = member.toMemberJwtClaims();
@@ -41,6 +41,21 @@ function generateJwtToken(member) {
     };
 
     return jwt.sign(payload, SECURITY_KEY, { expiresIn: '1h' }); // 토큰 만료 시간은 예시입니다. 필요에 따라 조정하세요.
+}
+
+exports.generateInvitationJwtToken = async function () {
+    const now = Date.now();
+
+    return jwt.sign(
+        {
+            sub: "invitation token",
+            header: createHeader(),
+            ...claims,
+            exp: Math.floor((now + 86400000) / 1000) // 1 day expiration
+        },
+        SECURITY_KEY,
+        { algorithm: "HS256" }
+    );
 }
 
 exports.createAuthCookie = function (res, member) {

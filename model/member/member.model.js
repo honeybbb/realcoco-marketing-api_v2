@@ -56,3 +56,17 @@ exports.findByPhoneNumber = async function (phoneNumber) {
         return {'data': '-9999'}
     }
 }
+
+exports.findByEmail = async function (email) {
+    let sql = "select * Members where email = ?"
+    let aParameter = [email];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res[0];
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}

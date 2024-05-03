@@ -25,7 +25,7 @@ exports. verifyToken = async function (token) {
 }
 
 exports.getMemberByEmail = async function (email) {
-    let result = await memberModel.getMemberByEmail(email);
+    let result = await memberModel.findByEmail(email);
 
     return result
 }
