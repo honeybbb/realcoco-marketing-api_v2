@@ -422,6 +422,48 @@ let calcFashionTrendKeyword1 = async function (keywords) {
 
 let calcFashionTrendKeyword = async function (keywords) {
     const weightMap = await getFashionTrendWeights();
+
+    // Promise.all을 사용하여 모든 키워드 점수 계산을 병렬로 실행
+    const keywordScoresPromises = keywords.map(k => getKeywordAndScores(k, weightMap));
+    const keywordScoresArrays = await Promise.all(keywordScoresPromises);
+    const keywordScores = keywordScoresArrays.flat(); // 배열을 평탄화
+
+    const keywordScoreMap = {};
+    keywordScores.forEach(score => {
+        const keywordId = score.keywordId;
+        const currentScore = keywordScoreMap[keywordId] || 0;
+        keywordScoreMap[keywordId] = currentScore + score.score;
+    });
+
+    const fashionTrendKeywords = [];
+
+    // Promise.all을 사용하여 모든 키워드 풀 조회를 병렬로 실행
+    const keywordIds = Object.keys(keywordScoreMap);
+    const keywordPoolsPromises = keywordIds.map(async (keywordId) => {
+        const keywordPool = await fashionTrendsModel.getRequiredKeywordPool(keywordId);
+        return { keywordId, keywordPool };
+    });
+    const keywordPools = await Promise.all(keywordPoolsPromises);
+
+    keywordPools.forEach(({ keywordId, keywordPool }) => {
+        if (keywordPool) {
+            const fashionTrendKeyword = {
+                keyword: keywordPool,
+                score: keywordScoreMap[keywordId]
+            };
+            fashionTrendKeywords.push(fashionTrendKeyword);
+        }
+    });
+
+    fashionTrendKeywords.sort((a, b) => b.score - a.score);
+
+    await calcRank(fashionTrendKeywords);
+
+    return fashionTrendKeywords;
+}
+
+let calcFashionTrendKeyword2 = async function (keywords) {
+    const weightMap = await getFashionTrendWeights();
     //console.log(keywords)
     const keywordScores = [];
     for (const k of keywords) {
@@ -485,6 +527,28 @@ const calcRank = async function (fashionTrends) {
 }
 // 크롤링 로그들(crawlLogs)에서 특정 키워드 타입(keywordTypes)을 가진 키워드들을 추출하는 기능
 const getKeywords = async function (crawlLogs, keywordTypes) {
+    let keywords = [];
+
+    // 모든 로그에 대한 작업을 병렬로 처리하기 위해 map과 Promise.all을 사용
+    const promises = crawlLogs.map(async (log) => {
+        let keywordType = log.type === 0 ? 'NAVERDATALAB' : Object.keys(KeywordType)[log.type + 1];
+        const parsedKeywords = await CrawlerType[keywordType].parse(log).flat();
+
+        // Array.isArray로 keywordTypes가 배열인지 확인 후 조건에 맞는 키워드만 필터링
+        if (!Array.isArray(keywordTypes)) {
+            return parsedKeywords.filter(k => k.type.name == keywordTypes.name);
+        } else {
+            return parsedKeywords.filter(k => keywordTypes.includes(k.type));
+        }
+    });
+
+    // 모든 프로미스가 완료될 때까지 기다린 후 결과를 합침
+    const results = await Promise.all(promises);
+    keywords = results.flat(); // 결과가 배열의 배열로 되어있으므로 flat을 사용하여 단일 배열로 만듦
+
+    return keywords;
+}
+const getKeywords1 = async function (crawlLogs, keywordTypes) {
     // crawlLogs.map(log => console.log(Object.keys(KeywordType)[log.type]));
     let keywords = [];
 
@@ -608,7 +672,7 @@ exports.getDailyKeywordScore = async function (kid, endDate) {
         let dailyScore = { date, score };
         result.push(dailyScore);
 
-        console.log(date, endDate);
+        console.log(date, endDate, 'getDailyKeywordScore');
 
         if (date == endDate) {
             break;
