@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const shopService = require('../../service/shop/shop.service');
 const memberModel = require('../../model/member/member.model');
 

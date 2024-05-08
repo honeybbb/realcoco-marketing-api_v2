@@ -10,7 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@elastic/elasticsearch": "^8.12.1",
+    "@elastic/elasticsearch": "^7.17.13",
     "axios": "^1.6.7",
     "base-64": "^1.0.0",
     "bcrypt": "^5.1.1",
