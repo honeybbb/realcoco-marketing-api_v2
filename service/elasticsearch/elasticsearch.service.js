@@ -1,6 +1,7 @@
 const { Client } = require('@elastic/elasticsearch')
 const {response} = require("express");
 const elasticsearchClient = new Client({ node: 'http://localhost:9200' })
+// const elasticsearchClient = new Client({ node: 'http://158.247.239.126:9200' })
 
 // 특정 카테고리로 제품 검색 (검색어, 검색결과크기)
 exports.searchProductByCategory = async function (query, size) {

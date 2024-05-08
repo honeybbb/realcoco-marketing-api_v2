@@ -86,10 +86,11 @@ module.exports = function (app) {
     app.get('/api/v1/:shopId/products/recommend', async (req, res) => {
         const shopId = req.params.shopId;
         const startDate = req.query.startDate,
-                endDate = req.query.endDate,
-                category = req.query.category;
+            endDate = req.query.endDate,
+            category = req.query.category;
 
         let recommendProducts = await productService.getRecommendProducts(startDate, endDate, category);
+        console.log(recommendProducts, 'recommendProducts')
         if(recommendProducts) {
             recommendProducts = recommendProducts.slice(0, 100);
         }

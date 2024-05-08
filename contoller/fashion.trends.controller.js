@@ -31,6 +31,29 @@ module.exports = function (app) {
 
         const keywordTypes = Object.values(KeywordType);
 
+        try {
+            // 모든 키워드 타입에 대한 요청을 동시에 시작합니다.
+            const promises = keywordTypes.map(kt =>
+                fashionTrendService.getFashionTrendKeywordsByKeywordType(date, kt)
+            );
+
+            // Promise.all을 사용하여 모든 요청이 완료될 때까지 기다립니다.
+            const responses = await Promise.all(promises);
+
+            // 결과 처리
+            const result = responses.map((keywords, index) => ({
+                keywordType: keywordTypes[index],
+                keywords: keywords.map(k => ({ name: k.keyword.name, rank: k.rank })).slice(0, 10)
+            }));
+
+            // 응답 보내기
+            res.json(result);
+        } catch (error) {
+            // 에러 처리
+            console.error(error);
+            res.status(500).send('Internal Server Error');
+        }
+/*
         let result = [];
 
         for(const kt of keywordTypes) {
@@ -43,6 +66,8 @@ module.exports = function (app) {
             })
 
         }
+
+ */
 /*
         const keywords = keywordTypes.map(async kt => {
             await fashionTrendService.getFashionTrendKeywordsByKeywordType(date, kt)
@@ -62,7 +87,7 @@ module.exports = function (app) {
         //const keywords = fashionTrendKeywords.map(k => k.keyword.map(word => word.name)).slice(0, 10);
         //const keywords = fashionTrendKeywords.map(k => /*k.keyword.map(word => word.name)*/ k.keyword.name).slice(0, 10);
 
-        res.json({'result':true, 'data': result});
+        //res.json({'result':true, 'data': result});
 
     });
 

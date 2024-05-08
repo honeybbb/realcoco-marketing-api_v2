@@ -27,12 +27,18 @@ module.exports = function (app) {
         let fashionTrendKeywords = await fashionTrendService.getFashionTrend(yesterday);
         fashionTrendKeywords = fashionTrendKeywords.slice(0, 20);
 
+        /*
         const result = [];
         for (let ftk of fashionTrendKeywords) {
             const rank = await fashionTrendService.getKeywordDailyRank(ftk.keyword, yesterday);
             result.push(rank);
         }
+        */
 
+
+        // Promise.all을 사용하여 비동기 작업을 병렬로 처리합니다.
+        const promises = fashionTrendKeywords.map(ftk => fashionTrendService.getKeywordDailyRank(ftk.keyword, yesterday));
+        const result = await Promise.all(promises);
         console.log(result, 'getKeywordDailyRank')
 
         res.json({ contents: result });

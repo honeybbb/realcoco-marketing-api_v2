@@ -238,6 +238,8 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
     //  특정 카테고리에 대한 상품 검색 결과를 가져오기. 검색 결과는 최대 20개.
     const elasticsearchProducts = await elasticsearchProductService.searchProductByCategory(keyword, 20);
 
+    console.log(elasticsearchProducts, 'elasticsearchProducts')
+
     // 검색된 제품 중에서 productIdSet에 포함되지 않은 제품만 선택 (중복제거)
     let products = elasticsearchProducts.filter(ep => !(ep.productNo in productIdSet));
 
