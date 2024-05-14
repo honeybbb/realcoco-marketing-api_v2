@@ -269,7 +269,7 @@ exports.getDailyProductScore = async function (productNo, endDate) {
     date.setDate(date.getDate() - 13);
 
     while (true) {
-        const score = await productService.getProductOrderCountMap(productNo, formatter(date), 1);
+        const score = await productService.getProductOrderCount(productNo, formatter(date), 1);
 
         const dailyScore = {
             date: formatter(date),
