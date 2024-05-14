@@ -671,9 +671,11 @@ let getCrawlLogByDate = async function (date) {
 }
 
 // 최근 14일간의 매일 키워드 점수를 반환하는 함수
-exports.getDailyKeywordScore1 = async function (kid, endDate) {
+exports.getDailyKeywordScore = async function (kid, endDate) {
     let result = [];
-    let date = twoWeeksAgo(new Date(endDate));
+    let endDateObj = new Date(endDate);
+    let date = new Date(endDateObj);
+    date.setDate(date.getDate() - 13);
 
     while (true) {
         const fashionTrendKeywords = await getFashionTrendKeywords(date)
@@ -687,21 +689,23 @@ exports.getDailyKeywordScore1 = async function (kid, endDate) {
             }
         }
 
-        let dailyScore = { date, score };
+        const dailyScore = {
+            date: formatter(date),
+            score: score
+        };
+
         result.push(dailyScore);
 
         console.log(date, endDate, 'getDailyKeywordScore');
 
-        if (date == endDate) {
+        if (date >= endDateObj) {
             break;
         }
 
-        date = formatter(new Date(new Date(date).setDate(new Date(date).getDate() + 1))) // 다음 날짜로 이동합니다.
-        //const score = fashionTrendKeywords.find(k => /*console.log(k)*/k)
-        //console.log(fashionTrendKeywords, score, '0000')
+        date.setDate(date.getDate() + 1);
     }
 
-    return { kid, result };
+    return { kid, scores: result };
 }
 
 exports.getFashionTrendKeywordsByKeywordType = async function (date, keywordType) {
