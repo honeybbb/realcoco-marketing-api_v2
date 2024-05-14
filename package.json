@@ -13,7 +13,6 @@
     "@elastic/elasticsearch": "^7.17.13",
     "axios": "^1.6.7",
     "base-64": "^1.0.0",
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

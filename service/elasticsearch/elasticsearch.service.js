@@ -1,7 +1,6 @@
 const { Client } = require('@elastic/elasticsearch')
 const {response} = require("express");
 const elasticsearchClient = new Client({ node: 'http://localhost:9200' })
-// const elasticsearchClient = new Client({ node: 'http://158.247.239.126:9200' })
 
 // 특정 카테고리로 제품 검색 (검색어, 검색결과크기)
 exports.searchProductByCategory = async function (query, size) {
@@ -10,19 +9,16 @@ exports.searchProductByCategory = async function (query, size) {
         size: size, // 검색 결과의 크기 설정
         body: {
             query: {
-                match_all: {} // 모든 문서를 검색하기 위한 쿼리
-                /*
+                match_all: {}, // 모든 문서를 검색하기 위한 쿼리
                 bool: {
                     should: this.makeCategoryBoolQueryBuilder(query), // 카테고리에 대한 불리언 쿼리 생성
                 }
-
-                 */
             }
         }
     });
 
     // Elasticsearch의 검색 결과를 리스트로 변환하여 반환
-    return response.hits.hits.map(hit => hit._source);
+    return response.body.hits.hits.map(hit => hit._source);
 }
 
 // 검색된 문서를 삭제합니다.
@@ -73,15 +69,13 @@ exports.makeCategoryBoolQueryBuilder = function (query) {
         shouldQueries.push(this.getBoostMatchQueryBuilder(key, query, boostMap[key]));
     }
 
-    return shouldQueries;
-    /*
+    // return shouldQueries;
+
     return {
         "bool": {
             "should": shouldQueries
         }
     };
-
-     */
 
 }
 
