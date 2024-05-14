@@ -280,12 +280,8 @@ exports.getProductOrderCountMap = async function (productIds, date, days) {
         throw new Error("invalid days");
     }
 
-    if(typeof date === 'string') {
-        date = new Date(date);
-    }
-
-    let startDate = new Date(date.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-    let endDate = new Date(date.getTime() + 1 * 24 * 60 * 60 * 1000);
+    let startDate = new Date(new Date(date).getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+    let endDate = new Date(new Date(date).getTime() + 1 * 24 * 60 * 60 * 1000);
 
     // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
     let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
