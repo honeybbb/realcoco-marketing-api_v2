@@ -69,13 +69,15 @@ exports.makeCategoryBoolQueryBuilder = function (query) {
         shouldQueries.push(this.getBoostMatchQueryBuilder(key, query, boostMap[key]));
     }
 
-    // return shouldQueries;
-
+    return shouldQueries;
+    /*
     return {
         "bool": {
             "should": shouldQueries
         }
     };
+
+     */
 
 }
 
