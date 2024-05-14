@@ -189,7 +189,25 @@ let getProductsSortByRank = async function (keywords) {
     return result
 }
 
-exports.getKeywordDailyRank = async function (keywordPool, endDate) {
+exports.getKeywordDailyRank1 = async function (keywordPool, endDate) {
+    let date = twoWeeksAgo(new Date(endDate));
+    let promises = [];
+
+    while (true) {
+        let currentDate = formatter(new Date(date));
+        promises.push(getFashionTrendKeywords(currentDate).then(fashionTrendKeywords => {
+            const rank = fashionTrendKeywords.find(k => k.keyword.id === keywordPool.id)?.rank ?? -1;
+            return { date: currentDate, rank };
+        }));
+
+        if (date == endDate) break;
+        date = new Date(date).setDate(new Date(date).getDate() + 1); // 다음 날짜로 이동
+    }
+
+    const allRanks = await Promise.all(promises);
+    return { keyword: keywordPool, ranks: allRanks };
+}
+exports.getKeywordDailyRank1 = async function (keywordPool, endDate) {
     let result = [];
     let date = twoWeeksAgo(new Date(endDate));
 
@@ -652,8 +670,42 @@ let getCrawlLogByDate = async function (date) {
     return crawlLogs;
 }
 
-// 최근 14일간의 매일 키워드 점수를 반환하는 함수
 exports.getDailyKeywordScore = async function (kid, endDate) {
+    const result = [];
+    let date = twoWeeksAgo(new Date(endDate));
+
+    // endDate까지의 모든 날짜를 배열로 생성
+    const dates = [];
+    while (date <= endDate) {
+        dates.push(new Date(date));
+        date = new Date(date.setDate(date.getDate() + 1)).toISOString().split('T')[0]; // 다음 날짜로 이동
+    }
+
+    // 모든 날짜에 대해 비동기 요청을 병렬로 처리
+    const promises = dates.map(async (date) => {
+        const fashionTrendKeywords = await getFashionTrendKeywords(date);
+        let score = -1;
+        for (let keyword of fashionTrendKeywords) {
+            if (keyword.keyword.id === kid) {
+                score = keyword.score;
+                break;
+            }
+        }
+        return { date: date.toISOString().split('T')[0], score }; // 날짜 포맷 변경
+    });
+
+    const scores = await Promise.all(promises);
+
+    // 결과 병합
+    scores.forEach(score => {
+        result.push(score);
+    });
+
+    return { kid, result };
+}
+
+// 최근 14일간의 매일 키워드 점수를 반환하는 함수
+exports.getDailyKeywordScore1 = async function (kid, endDate) {
     let result = [];
     let date = twoWeeksAgo(new Date(endDate));
 
