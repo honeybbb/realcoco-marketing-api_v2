@@ -189,7 +189,7 @@ let getProductsSortByRank = async function (keywords) {
     return result
 }
 
-exports.getKeywordDailyRank1 = async function (keywordPool, endDate) {
+exports.getKeywordDailyRank = async function (keywordPool, endDate) {
     let date = twoWeeksAgo(new Date(endDate));
     let promises = [];
 
@@ -261,15 +261,41 @@ function plusDays(date) {
     return result;
 }
 
-
 exports.getDailyProductScore = async function (productNo, endDate) {
     let result = [];
     let endDateObj = new Date(endDate);
     let date = new Date(endDateObj);
     date.setDate(date.getDate() - 13);
 
+    let promises = [];
+    while (date <= endDateObj) {
+        promises.push(productService.getProductOrderCountMap(productNo, formatter(date), 1).then(score => ({
+            date: formatter(date),
+            score: score
+        })).catch(error => {
+            console.error(`Error fetching data for ${productNo} on ${formatter(date)}: ${error}`);
+            return null; // 에러가 발생한 경우 null을 반환하여 결과 배열에 추가하지 않음
+        }));
+        date.setDate(date.getDate() + 1);
+    }
+
+    const scores = await Promise.all(promises);
+    const filteredScores = scores.filter(score => score !== null); // 에러로 인해 null이 반환된 요소 제거
+
+    return {
+        productNo: productNo,
+        scores: filteredScores
+    };
+}
+
+exports.getDailyProductScore1 = async function (productNo, endDate) {
+    let result = [];
+    let endDateObj = new Date(endDate);
+    let date = new Date(endDateObj);
+    date.setDate(date.getDate() - 13);
+
     while (true) {
-        const score = await productService.getProductOrderCount(productNo, formatter(date), 1);
+        const score = await productService.getProductOrderCountMap(productNo, formatter(date), 1);
 
         const dailyScore = {
             date: formatter(date),
@@ -548,9 +574,9 @@ const getKeywords = async function (crawlLogs, keywordTypes) {
     let keywords = [];
 
     // 모든 로그에 대한 작업을 병렬로 처리하기 위해 map과 Promise.all을 사용
-    const promises = crawlLogs.map(async (log) => {
+    const promises = crawlLogs.map((log) => {
         let keywordType = log.type === 0 ? 'NAVERDATALAB' : Object.keys(KeywordType)[log.type + 1];
-        const parsedKeywords = await CrawlerType[keywordType].parse(log).flat();
+        const parsedKeywords = CrawlerType[keywordType].parse(log).flat();
 
         // Array.isArray로 keywordTypes가 배열인지 확인 후 조건에 맞는 키워드만 필터링
         if (!Array.isArray(keywordTypes)) {
@@ -683,7 +709,7 @@ exports.getDailyKeywordScore = async function (kid, endDate) {
         let score = -1;
         for (let keyword of fashionTrendKeywords) {
 
-            if (keyword.keyword.id === kid) {
+            if (keyword.keyword.id == kid) {
                 score = keyword.score;
                 break;
             }
@@ -696,7 +722,7 @@ exports.getDailyKeywordScore = async function (kid, endDate) {
 
         result.push(dailyScore);
 
-        console.log(date, endDate, 'getDailyKeywordScore');
+        // console.log(date, endDate, 'getDailyKeywordScore');
 
         if (date >= endDateObj) {
             break;

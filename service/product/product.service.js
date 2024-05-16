@@ -280,22 +280,24 @@ exports.getProductOrderCountMap = async function (productIds, date, days) {
         throw new Error("invalid days");
     }
 
-    let startDate = new Date(date.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-    let endDate = new Date(date.getTime() + 1 * 24 * 60 * 60 * 1000);
+    const startDate = new Date(date);
+    startDate.setDate(startDate.getDate() - days + 1);
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 1);
 
     // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
     let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
 
-    let productOrderCountMap = {};
-    productOrderCountStats.forEach(stat => {
-        if(productOrderCountMap[stat.productNo]) {
-            productOrderCountMap[stat.productNo] += stat.totalOrderCount;
-        } else {
-            productOrderCountMap[stat.productNo] = stat.totalOrderCount;
-        }
-    });
+    // console.log(productOrderCountStats, 'productOrderCountStats')
 
-    return productOrderCountMap;
+    return productOrderCountStats.reduce((map, stat) => {
+        if (map[stat.product_no]) {
+            map[stat.product_no] += stat.total_view_count;
+        } else {
+            map[stat.product_no] = stat.total_view_count;
+        }
+        return map[stat.product_no];
+    }, {});
 }
 
 exports.getProductOrderCount = async (productNo, date) => {

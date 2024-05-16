@@ -9,13 +9,13 @@ function generateId() {
 }
 
 exports.findProductStats = async function (productIds, startDate, endDate) {
-    let sql = "select * from DailyProductStats where product_no = ? and date between (?) and (?)";
+    let sql = "select * from DailyProductStats where product_no in (?) and date between (?) and (?)";
     let aParameter = [productIds, startDate, endDate];
 
     let query = mysql.format(sql, aParameter);
     try {
         let res = await pool.query(query);
-        return res[0];
+        return res;
     }catch (e) {
         console.log('db err', e);
         return {'data': '-9999'}

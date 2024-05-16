@@ -98,7 +98,9 @@ module.exports = function (app) {
 
         keywordIds = keywordIds.split(',');
 
-        let result = await Promise.all(keywordIds.map(async kid => await fashionTrendService.getDailyKeywordScore(kid, endDate)));
+        let result = await Promise.all(
+            keywordIds.map(kid => fashionTrendService.getDailyKeywordScore(kid, endDate))
+        );
 
         res.json({ 'result':true, 'contents': result });
     });
