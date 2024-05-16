@@ -10,9 +10,9 @@ exports.searchProductByCategory = async function (query, size) {
         body: {
             query: {
                 match_all: {}, // 모든 문서를 검색하기 위한 쿼리
-                bool: {
-                    should: this.makeCategoryBoolQueryBuilder(query), // 카테고리에 대한 불리언 쿼리 생성
-                }
+                // bool: {
+                //     should: this.makeCategoryBoolQueryBuilder(query), // 카테고리에 대한 불리언 쿼리 생성
+                // }
             }
         }
     });
