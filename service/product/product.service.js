@@ -306,6 +306,27 @@ exports.getProductOrderCount = async (productNo, date) => {
     return Math.floor(Math.random() * 100); // Promise.resolve() 없이 바로 반환
 };
 
+exports.getProductViewCountMap = async function (productNo, date, days) {
+    if(days <= 0) {
+        throw new Error("invalid days");
+    }
+
+    const startDate = new Date(date);
+    startDate.setDate(startDate.getDate() - days + 1);
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 1);
+
+    let productOrderCountStats = await productModel.findProductStats(productNo, startDate, endDate);
+
+    return productOrderCountStats.reduce((map, stat) => {
+        if (map[stat.product_no]) {
+            map[stat.product_no] += stat.total_view_count;
+        } else {
+            map[stat.product_no] = stat.total_view_count;
+        }
+        return map[stat.product_no];
+    }, {});
+}
 let getRecommendWeightMap = async function (products) {
     let result = [];
 
@@ -452,16 +473,31 @@ exports.addExcludeBestProducts = async function (shopId, date, productNos) {
 }
 
 exports.getProductStat = async function (productId) {
-    const productStat = await productModel.findByProductNo(productId);
-    productStat.totalOrderCount = 0;
-    productStat.totalViewCount = 0;
+    let product = await productModel.findById(productId);
+    let productStat = this.fromProduct(product)
+    let productStats = await productModel.findByProductNo(productId);
 
-    productStat.forEach((ps) => {
+    // productStats.totalOrderCount = 0;
+    // productStats.totalViewCount = 0;
+
+    productStats.forEach((ps) => {
         productStat.totalOrderCount += ps.total_order_count
         productStat.totalViewCount += ps.total_view_count
     })
 
     return productStat
+}
+
+exports.fromProduct = function (product) {
+    let productStat = {
+        ...product,
+        totalViewCount: 0,
+        totalOrderCount: 0,
+        clickValue: 123,
+        orderRate: 32.3
+    };
+
+    return productStat;
 }
 
 exports.searchByProductName = async function (productName) {

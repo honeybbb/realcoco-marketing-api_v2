@@ -288,6 +288,37 @@ exports.getDailyProductScore = async function (productNo, endDate) {
     };
 }
 
+exports.getDailyProductScoreDetail = async function(productNo, endDate) {
+    let result = [];
+    let endDateObj = new Date(endDate);
+    let date = new Date(endDateObj);
+    date.setDate(date.getDate() - 13);
+
+    while (true) {
+        const orderCount = productService.getProductOrderCountMap(productNo, date, 1);
+        const viewCount = productService.getProductViewCountMap(productNo, date, 1);
+
+        let dailyScoreDetail = {
+            date: date,
+            viewCount: viewCount,
+            orderCount: orderCount
+        };
+
+        result.push(dailyScoreDetail);
+
+        if (date.isSame(endDate)) {
+            break;
+        }
+
+        date = date.add(1, 'days');
+    }
+
+    return {
+        productNo: productNo,
+        result: result
+    }
+}
+
 exports.getDailyProductScore1 = async function (productNo, endDate) {
     let result = [];
     let endDateObj = new Date(endDate);

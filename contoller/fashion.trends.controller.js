@@ -220,4 +220,13 @@ module.exports = function (app) {
             res.status(500).send({ error: 'Internal Server Error' });
         }
     })
+
+    app.get('/api/v1/:shopId/fashion-trends/products/:productNo/score/daily', async function (req, res) {
+        const shopId = req.params.shopId;
+        const { productNo, endDate } = req.query;
+
+        const result = fashionTrendService.getDailyProductScoreDetail(productNo, endDate);
+
+        res.json({'result': true, 'data': result})
+    })
 }
