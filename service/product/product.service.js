@@ -292,9 +292,9 @@ exports.getProductOrderCountMap = async function (productIds, date, days) {
 
     return productOrderCountStats.reduce((map, stat) => {
         if (map[stat.product_no]) {
-            map[stat.product_no] += stat.total_view_count;
+            map[stat.product_no] += stat.total_order_count;
         } else {
-            map[stat.product_no] = stat.total_view_count;
+            map[stat.product_no] = stat.total_order_count;
         }
         return map[stat.product_no];
     }, {});
