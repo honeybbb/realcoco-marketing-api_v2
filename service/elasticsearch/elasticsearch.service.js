@@ -9,10 +9,10 @@ exports.searchProductByCategory = async function (query, size) {
         size: size, // 검색 결과의 크기 설정
         body: {
             query: {
-                match_all: {}, // 모든 문서를 검색하기 위한 쿼리
-                // bool: {
-                //     should: this.makeCategoryBoolQueryBuilder(query), // 카테고리에 대한 불리언 쿼리 생성
-                // }
+                // match_all: {}, // 모든 문서를 검색하기 위한 쿼리
+                bool: {
+                    should: this.makeCategoryBoolQueryBuilder(query), // 카테고리에 대한 불리언 쿼리 생성
+                }
             }
         }
     });
