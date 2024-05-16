@@ -183,10 +183,11 @@ let getDailyRecommendProducts = async function (date) {
     }
 
     return productsSortByRank.map(product => {
+        console.log(product, 'productsSortByRank product')
         //console.log(dailyProductStatMap, 'dailyProductStatMap')
-        let dailyProductStat = dailyProductStatMap[product.product_no] ? dailyProductStatMap[product.product_no] : DailyProductStat;
+        let dailyProductStat = dailyProductStatMap[product.productNo] ? dailyProductStatMap[product.productNo] : DailyProductStat;
         //console.log(dailyProductStat, 'dailyProductStat')
-        let recommendWeight = recommendWeightMap[product.product_no];
+        let recommendWeight = recommendWeightMap[product.productNo];
 
         return {
             product : product,
