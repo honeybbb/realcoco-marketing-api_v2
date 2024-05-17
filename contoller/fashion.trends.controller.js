@@ -12,6 +12,10 @@ const KeywordType = {
     BRANDY: { name: "브랜디", defaultWeight: 50 },
 };
 
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 3600 }); // Cache TTL is set to 1 hour
+
+
 module.exports = function (app) {
     app.get('/api/v1/:shopId/fashion-trends', async (req, res) => {
         const shopId = req.params.shopId;
@@ -96,13 +100,33 @@ module.exports = function (app) {
         let keywordIds = req.query.keywordIds,
             endDate = req.query.endDate;
 
+        // 캐시 키 생성
+        const cacheKey = `keywords-${shopId}`;
+        const cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return res.json({ source: 'cache', data: cachedData });
+        }
+
+        if(!keywordIds || !endDate) {
+            return res.status(400).send({ error: 'keywordIds and endDate are required.' });
+        }
+
         keywordIds = keywordIds.split(',');
 
-        let result = await Promise.all(
-            keywordIds.map(kid => fashionTrendService.getDailyKeywordScore(kid, endDate))
-        );
+        try {
+            let result = await Promise.all(
+                keywordIds.map(kid => fashionTrendService.getDailyKeywordScore(kid, endDate))
+            );
 
-        res.json({ 'result':true, 'contents': result });
+            cache.set(cacheKey, result)
+
+            res.json({ 'result':true, 'contents': result });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({ error: 'Internal Server Error' });
+        }
+
+
     });
 
     app.put('/api/v1/:shopId/custom-fashion-trends', async function (req, res) {
@@ -202,6 +226,13 @@ module.exports = function (app) {
         const shopId = req.params.shopId;
         const { productNos, endDate } = req.query;
 
+        // 캐시 키 생성
+        const cacheKey = `products-${shopId}`;
+        const cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return res.json({ source: 'cache', data: cachedData });
+        }
+
         if(!productNos || !endDate) {
             return res.status(400).send({ error: 'productNos and endDate are required.' });
         }
@@ -213,6 +244,8 @@ module.exports = function (app) {
             const results = await Promise.all(
                 productIds.map(productId => fashionTrendService.getDailyProductScore(productId, endDate))
             );
+
+            cache.set(cacheKey, results)
 
             res.json({ 'result': true, data:results });
         } catch (error) {

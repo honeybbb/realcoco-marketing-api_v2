@@ -261,7 +261,7 @@ function plusDays(date) {
     return result;
 }
 
-exports.getDailyProductScore1 = async function (productNo, endDate) {
+exports.getDailyProductScore2 = async function (productNo, endDate) {
     let result = [];
     let endDateObj = new Date(endDate);
     let date = new Date(endDateObj);
@@ -319,6 +319,31 @@ exports.getDailyProductScoreDetail = async function(productNo, endDate) {
         result: result
     }
 }
+exports.getDailyProductScore1 = async function (productNo, endDate) {
+    let result = [];
+    let endDateObj = new Date(endDate);
+    let date = new Date(endDateObj);
+    date.setDate(date.getDate() - 13);
+
+    const dateRange = [];
+    while (date <= endDateObj) {
+        dateRange.push(new Date(date));
+        date.setDate(date.getDate() + 1);
+    }
+
+    const scores = await Promise.all(dateRange.map(async date => {
+        const score = await productService.getProductOrderCountMap(productNo, formatter(date), 1);
+        return {
+            date: formatter(date),
+            score: score
+        };
+    }));
+
+    return {
+        productNo: productNo,
+        scores: scores
+    };
+};
 
 exports.getDailyProductScore = async function (productNo, endDate) {
     let result = [];

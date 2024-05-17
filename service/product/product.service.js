@@ -290,10 +290,7 @@ exports.getProductOrderCountMap = async function (productIds, date, days) {
     let endDate = new Date(date);
     endDate.setDate(endDate.getDate() + 1);
 
-    // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
     let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
-
-    // console.log(productOrderCountStats, 'productOrderCountStats')
 
     return productOrderCountStats.reduce((map, stat) => {
         if (map[stat.product_no]) {
