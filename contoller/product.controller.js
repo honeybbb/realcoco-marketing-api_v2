@@ -72,7 +72,7 @@ module.exports = function (app) {
         res.json({'result': true, 'data': result})
     })
 
-    app.post('/api/v1/:shopId/products/:productId', async (req, res) => {
+    app.get('/api/v1/:shopId/products/:productId', async (req, res) => {
         const shopId = req.params.shopId;
         const productId = req.params.productId;
 

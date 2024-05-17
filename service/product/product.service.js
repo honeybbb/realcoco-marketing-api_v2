@@ -166,14 +166,19 @@ let getDailyRecommendProducts = async function (date) {
     // 순위별로 정렬된 상품들의 ID를 리스트로 만들기
     let productNos = productsSortByRank.map(product => product.productNo).join(',');
 
+
     date = await formatter(date);
     // 상품 ID 리스트와 특정 날짜를 기반으로 각 상품의 일일 상품 통계를 맵 형태
     // 일일 제품 통계 가져와서 맵으로 변환
-    const dailyProductStatMap = (await productModel.findDailyProductStats(productNos, date))
-        .reduce((map, stat) => {
-            map[stat.product_no] = stat;
-            return map;
-        }, {});
+    let dailyProductStatMap = {};
+    let dailyProductStats = await productModel.findDailyProductStats(productNos, date);
+
+    dailyProductStats.forEach(stat => {
+        //console.log(stat, 's')
+        dailyProductStatMap[stat.product_no] = stat;
+    });
+
+    console.log(productsSortByRank)
 
     return productsSortByRank.map(product => {
         //console.log(dailyProductStatMap, 'dailyProductStatMap')
@@ -183,7 +188,7 @@ let getDailyRecommendProducts = async function (date) {
 
         return {
             product : product,
-            dailyProductStat : dailyProductStat,
+            dailyProductStat : dailyProductStat[product.productNo],
             recommendWeight : recommendWeight
         }
     });

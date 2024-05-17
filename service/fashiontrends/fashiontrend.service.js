@@ -261,7 +261,7 @@ function plusDays(date) {
     return result;
 }
 
-exports.getDailyProductScore = async function (productNo, endDate) {
+exports.getDailyProductScore1 = async function (productNo, endDate) {
     let result = [];
     let endDateObj = new Date(endDate);
     let date = new Date(endDateObj);
@@ -269,8 +269,9 @@ exports.getDailyProductScore = async function (productNo, endDate) {
 
     let promises = [];
     while (date <= endDateObj) {
-        promises.push(productService.getProductOrderCountMap(productNo, formatter(date), 1).then(score => ({
-            date: formatter(date),
+        let currentDate = new Date(date);
+        promises.push(productService.getProductOrderCountMap(productNo, formatter(currentDate), 1).then(score => ({
+            date: formatter(currentDate),
             score: score
         })).catch(error => {
             console.error(`Error fetching data for ${productNo} on ${formatter(date)}: ${error}`);
@@ -319,7 +320,7 @@ exports.getDailyProductScoreDetail = async function(productNo, endDate) {
     }
 }
 
-exports.getDailyProductScore1 = async function (productNo, endDate) {
+exports.getDailyProductScore = async function (productNo, endDate) {
     let result = [];
     let endDateObj = new Date(endDate);
     let date = new Date(endDateObj);
