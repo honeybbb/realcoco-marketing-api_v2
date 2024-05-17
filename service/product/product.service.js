@@ -242,18 +242,25 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
     console.log(elasticsearchProducts, 'elasticsearchProducts')
 
     // 검색된 제품 중에서 productIdSet에 포함되지 않은 제품만 선택 (중복제거)
-    let products = elasticsearchProducts.filter(ep => !(ep.productNo in productIdSet));
+    let products = elasticsearchProducts.filter(ep => !(ep.product_no in productIdSet));
 
     // for (let i = 0; i < products.length; i++) {
     //     products[i] = await getProductOptional(products[i].productNo);
     // }
 
+    console.log(products, 'products')
+
     products = products.filter(product => product !== null).flatMap(p=>p);
+
+    console.log(products, 'products2')
+
     const productIds = products.map(product => product.product_no);
 
     // 제품의 주문 수
-    /*
-    let productOrderCountMap = getProductOrderCountMap(productIds, date, 3);
+
+    let productOrderCountMap = this.getProductOrderCountMap(productIds, date, 3);
+
+    console.log(productOrderCountMap, 'productOrderCountMap')
 
     // 정렬된 제품 중에서, 상위 3개의 제품만 선택
     products.sort((p1, p2) => {
@@ -261,8 +268,6 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
         const count2 = productOrderCountMap[p2.product_no] || 0;
         return count2 - count1;
     });
-
-     */
 
 
     products = products.slice(0, 3);
