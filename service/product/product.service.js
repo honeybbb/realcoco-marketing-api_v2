@@ -293,6 +293,8 @@ let getProductOrderCountMap = async function (productIds, date, days) {
     const endDate = plusDays(date);
     // endDate.setDate(endDate.getDate() + 1);
 
+    console.log(startDate, endDate)
+
     // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
     let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
 
