@@ -101,7 +101,7 @@ module.exports = function (app) {
             endDate = req.query.endDate;
 
         // 캐시 키 생성
-        const cacheKey = `keywords-${shopId}`;
+        const cacheKey = `keywords-${shopId}-${keywordIds}`;
         const cachedData = cache.get(cacheKey);
         if (cachedData) {
             return res.json({ source: 'cache', data: cachedData });
@@ -227,7 +227,7 @@ module.exports = function (app) {
         const { productNos, endDate } = req.query;
 
         // 캐시 키 생성
-        const cacheKey = `products-${shopId}`;
+        const cacheKey = `products-${shopId}-${productNos}`;
         const cachedData = cache.get(cacheKey);
         if (cachedData) {
             return res.json({ source: 'cache', data: cachedData });
