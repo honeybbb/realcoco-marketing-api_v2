@@ -256,11 +256,9 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
 
     const productIds = products.map(product => product.product_no);
 
-    console.log(productIds, date)
-
     // 제품의 주문 수
-
-    let productOrderCountMap = await getProductOrderCountMap(productIds, date, 3);
+/*
+    let productOrderCountMap = this.getProductOrderCountMap(productIds, date, 3);
 
     console.log(productOrderCountMap, 'productOrderCountMap')
 
@@ -270,6 +268,8 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
         const count2 = productOrderCountMap[p2.product_no] || 0;
         return count2 - count1;
     });
+
+ */
 
 
     products = products.slice(0, 3);
@@ -283,44 +283,15 @@ let getProductOptional = async function (productNo) {
     return result
 }
 
-let getProductOrderCountMap = async function (productIds, date, days) {
-    if(days <= 0) {
-        throw new Error("invalid days");
-    }
-
-    let startDate = new Date(date);
-    startDate.substring(0, 10)
-    // startDate.setDate(startDate.getDate() - days + 1);
-    let endDate = plusDays(date);
-    endDate.substring(0, 10)
-    // endDate.setDate(endDate.getDate() + 1);
-
-    console.log(startDate, endDate)
-
-    // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
-    let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
-
-    // console.log(productOrderCountStats, 'productOrderCountStats')
-
-    return productOrderCountStats.reduce((map, stat) => {
-        if (map[stat.product_no]) {
-            map[stat.product_no] += stat.total_order_count;
-        } else {
-            map[stat.product_no] = stat.total_order_count;
-        }
-        return map[stat.product_no];
-    }, {});
-}
-
 exports.getProductOrderCountMap = async function (productIds, date, days) {
     if(days <= 0) {
         throw new Error("invalid days");
     }
 
     const startDate = new Date(date);
-    // startDate.setDate(startDate.getDate() - days + 1);
-    const endDate = plusDays(date);
-    // endDate.setDate(endDate.getDate() + 1);
+    startDate.setDate(startDate.getDate() - days + 1);
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 1);
 
     // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
     let productOrderCountStats = await productModel.findProductStats(productIds, startDate, endDate);
