@@ -258,7 +258,7 @@ let getProductByKeyword = async function (date, keyword, productIdSet) {
 
     // 제품의 주문 수
 
-    let productOrderCountMap = this.getProductOrderCountMap(productIds, date, 3);
+    let productOrderCountMap = await this.getProductOrderCountMap(productIds, date, 3);
 
     console.log(productOrderCountMap, 'productOrderCountMap')
 
