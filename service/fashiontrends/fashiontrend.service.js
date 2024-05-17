@@ -603,14 +603,20 @@ const calcRank = async function (fashionTrends) {
 // 크롤링 로그들(crawlLogs)에서 특정 키워드 타입(keywordTypes)을 가진 키워드들을 추출하는 기능
 const getKeywords = async function (crawlLogs, keywordTypes) {
     let keywords = [];
+    const isKeywordTypesArray = Array.isArray(keywordTypes);
+
+    const filteredLogs = crawlLogs.filter(log => {
+        let keywordType = log.type === 0 ? 'NAVERDATALAB' : Object.keys(KeywordType)[log.type + 1];
+        // 여기서는 예시로 모든 로그를 처리하도록 설정하지만, 필요에 따라 필터링 조건을 추가할 수 있습니다.
+        return CrawlerType[keywordType];
+    });
 
     // 모든 로그에 대한 작업을 병렬로 처리하기 위해 map과 Promise.all을 사용
-    const promises = crawlLogs.map((log) => {
+    const promises = filteredLogs.map((log) => {
         let keywordType = log.type === 0 ? 'NAVERDATALAB' : Object.keys(KeywordType)[log.type + 1];
         const parsedKeywords = CrawlerType[keywordType].parse(log).flat();
 
-        // Array.isArray로 keywordTypes가 배열인지 확인 후 조건에 맞는 키워드만 필터링
-        if (!Array.isArray(keywordTypes)) {
+        if (!isKeywordTypesArray) {
             return parsedKeywords.filter(k => k.type.name == keywordTypes.name);
         } else {
             return parsedKeywords.filter(k => keywordTypes.includes(k.type));
@@ -619,7 +625,7 @@ const getKeywords = async function (crawlLogs, keywordTypes) {
 
     // 모든 프로미스가 완료될 때까지 기다린 후 결과를 합침
     const results = await Promise.all(promises);
-    keywords = results.flat(); // 결과가 배열의 배열로 되어있으므로 flat을 사용하여 단일 배열로 만듦
+    keywords = results.flat();
 
     return keywords;
 }
