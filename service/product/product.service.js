@@ -157,8 +157,10 @@ function merge(obj1, obj2) {
 let getDailyRecommendProducts = async function (date) {
     // 특정 날짜에 대한 패션 트렌드 키워드 가져오기
     let fashionTrend = await fashionTrendService.getFashionTrend(date);
+
     // 각 제품을 순위 별로 정리
     let productsSortByRank = await getProductsSortByRank(fashionTrend);
+
     // 순위별로 정렬된 상품들에 추천 가중치 맵 가져오기
     let recommendWeightMap = await getRecommendWeightMap(productsSortByRank);
     // 순위별로 정렬된 상품들의 ID를 리스트로 만들기
@@ -166,26 +168,16 @@ let getDailyRecommendProducts = async function (date) {
 
     date = await formatter(date);
     // 상품 ID 리스트와 특정 날짜를 기반으로 각 상품의 일일 상품 통계를 맵 형태
-    let dailyProductStatMap = {};
-    let dailyProductStats = await productModel.findDailyProductStats(productNos, date);
-
-    //console.log(dailyProductStats)
-
-    dailyProductStats.forEach(stat => {
-        //console.log(stat, 's')
-        dailyProductStatMap[stat.product_no] = stat;
-    });
-
-    let DailyProductStat = {
-        productNo: 0,
-        totalViewCount: 0,
-        totalOrderCount: 0
-    }
+    // 일일 제품 통계 가져와서 맵으로 변환
+    const dailyProductStatMap = (await productModel.findDailyProductStats(productNos, date))
+        .reduce((map, stat) => {
+            map[stat.product_no] = stat;
+            return map;
+        }, {});
 
     return productsSortByRank.map(product => {
-        console.log(product, 'productsSortByRank product')
         //console.log(dailyProductStatMap, 'dailyProductStatMap')
-        let dailyProductStat = dailyProductStatMap[product.productNo] ? dailyProductStatMap[product.productNo] : DailyProductStat;
+        let dailyProductStat = dailyProductStatMap[product.productNo] ? dailyProductStatMap[product.productNo] : dailyProductStatMap;
         //console.log(dailyProductStat, 'dailyProductStat')
         let recommendWeight = recommendWeightMap[product.productNo];
 
@@ -288,9 +280,9 @@ exports.getProductOrderCountMap = async function (productIds, date, days) {
         throw new Error("invalid days");
     }
 
-    const startDate = new Date(date);
+    let startDate = new Date(date);
     startDate.setDate(startDate.getDate() - days + 1);
-    const endDate = new Date(date);
+    let endDate = new Date(date);
     endDate.setDate(endDate.getDate() + 1);
 
     // dailyProductStatRepository.findProductStats의 JavaScript 버전이 필요합니다.
@@ -319,9 +311,9 @@ exports.getProductViewCountMap = async function (productNo, date, days) {
         throw new Error("invalid days");
     }
 
-    const startDate = new Date(date);
+    let startDate = new Date(date);
     startDate.setDate(startDate.getDate() - days + 1);
-    const endDate = new Date(date);
+    let endDate = new Date(date);
     endDate.setDate(endDate.getDate() + 1);
 
     let productOrderCountStats = await productModel.findProductStats(productNo, startDate, endDate);
