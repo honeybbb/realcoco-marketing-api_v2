@@ -289,10 +289,10 @@ let getProductOrderCountMap = async function (productIds, date, days) {
     }
 
     let startDate = new Date(date);
-    startDate = formatter(startDate)
+    startDate.substring(0, 10)
     // startDate.setDate(startDate.getDate() - days + 1);
     let endDate = plusDays(date);
-    endDate = formatter(endDate)
+    endDate.substring(0, 10)
     // endDate.setDate(endDate.getDate() + 1);
 
     console.log(startDate, endDate)
