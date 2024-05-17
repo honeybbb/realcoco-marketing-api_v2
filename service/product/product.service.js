@@ -288,9 +288,11 @@ let getProductOrderCountMap = async function (productIds, date, days) {
         throw new Error("invalid days");
     }
 
-    const startDate = new Date(date);
+    let startDate = new Date(date);
+    startDate = formatter(startDate)
     // startDate.setDate(startDate.getDate() - days + 1);
-    const endDate = plusDays(date);
+    let endDate = plusDays(date);
+    endDate = formatter(endDate)
     // endDate.setDate(endDate.getDate() + 1);
 
     console.log(startDate, endDate)
