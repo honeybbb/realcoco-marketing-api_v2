@@ -78,11 +78,11 @@ exports.getRealtimeInflowCafe24Member = async function (pageRequest) {
         // 데이터베이스에서 데이터 가져오기 sort: "lastAccessTime", order: "DESC", where: "AND  LIKE '%%'"
         const realtimeInflowCafe24Member = await memberModel.getRealtimeMember(sort, order.toUpperCase(), searchClause);
 
-        //console.log(realtimeInflowCafe24Member, 'realtime/inflow/cafe24-members')
+        console.log(realtimeInflowCafe24Member, 'realtime/inflow/cafe24-members')
         // 복호화 임시로 주석
-        realtimeInflowCafe24Member.forEach(member => {
-            toDecrypt(member);
-        });
+        // realtimeInflowCafe24Member.forEach(member => {
+        //     toDecrypt(member);
+        // });
 
         return realtimeInflowCafe24Member;
     } catch (error) {
