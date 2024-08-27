@@ -113,7 +113,7 @@ function decrypt(dbData) {
     let decrypted = decipher.update(dbData, 'base64', 'utf-8');
     decrypted += decipher.final('utf-8');
 
-    console.log(decrypted, 'decrypted')
+    //console.log(decrypted, 'decrypted')
     return decrypted;
 }
 
