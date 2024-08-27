@@ -112,6 +112,8 @@ function decrypt(dbData) {
     const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptKey, 'utf-8'), null);
     let decrypted = decipher.update(dbData, 'base64', 'utf-8');
     decrypted += decipher.final('utf-8');
+
+    console.log(decrypted, 'decrypted')
     return decrypted;
 }
 
@@ -121,7 +123,7 @@ function toDecrypt(data) {
     data.name = decrypt(data.name);
     data.cellPhone = decrypt(data.cellPhone);
 
-    console.log(data)
+    //console.log(data)
 
     //data.name = (data.name);
     //data.cellPhone = (data.cellPhone);
