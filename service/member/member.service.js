@@ -118,7 +118,7 @@ function decrypt(dbData) {
 }
 
 function toDecrypt(data) {
-    console.log(data, '멤버 데이터')
+    //console.log(data, '멤버 데이터')
 
     data.name = decrypt(data.name);
     data.cellPhone = decrypt(data.cellPhone);
