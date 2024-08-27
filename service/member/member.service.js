@@ -122,6 +122,8 @@ function toDecrypt(data) {
     data.name = decrypt(data.name);
     data.cellPhone = decrypt(data.cellPhone);
 
+    console.log(data)
+
     //data.name = (data.name);
     //data.cellPhone = (data.cellPhone);
 
