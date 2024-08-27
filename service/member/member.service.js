@@ -71,7 +71,7 @@ exports.comparePasswords = async function (inputPassword, storedPassword) {
 
 exports.getRealtimeInflowCafe24Member = async function (pageRequest) {
     const sort = pageRequest.sort || 'lastAccessTime';
-    const order = pageRequest.order || 'ASC';
+    const order = pageRequest.order || 'DESC';
     const searchClause = getSearchClause(pageRequest);
 
     try {
