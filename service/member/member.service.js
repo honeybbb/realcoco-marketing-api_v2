@@ -105,7 +105,9 @@ const getSearchClause = function (pageRequest) {
 }
 
 function decrypt(dbData) {
+    console.log(dbData)
     if (!dbData) {
+        console.log('ddd')
         return null;
     }
 
