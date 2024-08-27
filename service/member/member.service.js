@@ -104,7 +104,7 @@ const getSearchClause = function (pageRequest) {
     }
 }
 
-exports.decrypt = function (dbData) {
+function decrypt(dbData) {
     if (!dbData) {
         return null;
     }
@@ -120,8 +120,8 @@ exports.decrypt = function (dbData) {
 function toDecrypt(data) {
     //console.log(data, '멤버 데이터')
 
-    data.name = this.decrypt(data.name);
-    data.cellPhone = this.decrypt(data.cellPhone);
+    data.name = decrypt(data.name);
+    data.cellPhone = decrypt(data.cellPhone);
 
     //console.log(data)
 
