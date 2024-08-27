@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const shopService = require('../../service/shop/shop.service');
 const memberModel = require('../../model/member/member.model');
+const algorithm = 'aes-128-ecb'; // AES-128-ECB 사용
+const encryptKey = 'realcocorealcoco'; // 키
 
 // 사용자 정보를 바탕으로 JWT를 발급하는 함수
 exports.generateToken =  async function (user) {
@@ -102,22 +104,19 @@ const getSearchClause = function (pageRequest) {
     }
 }
 
+function decrypt(dbData) {
+    if (!dbData) {
+        return null;
+    }
+
+    const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptKey, 'utf-8'), null);
+    let decrypted = decipher.update(dbData, 'base64', 'utf-8');
+    decrypted += decipher.final('utf-8');
+    return decrypted;
+}
+
 function toDecrypt(data) {
     //console.log(data, '멤버 데이터')
-    const algorithm = 'aes-128-ecb'; // AES-128-ECB 사용
-    const encryptKey = 'realcocorealcoco'; // 키
-    function decrypt(dbData) {
-        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptKey, 'utf-8'), null);
-        let decrypted;
-
-        try {
-            decrypted = decipher.update(dbData, 'base64', 'utf-8');
-            decrypted += decipher.final('utf-8');
-            return decrypted;
-        } catch (error) {
-            return null; // 복호화 실패 시 null 반환
-        }
-    }
 
     data.name = decrypt(data.name);
     data.cellPhone = decrypt(data.cellPhone);
