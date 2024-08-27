@@ -80,9 +80,9 @@ exports.getRealtimeInflowCafe24Member = async function (pageRequest) {
 
         console.log(realtimeInflowCafe24Member[0], 'realtime/inflow/cafe24-members')
         // 복호화 임시로 주석
-        // realtimeInflowCafe24Member.forEach(member => {
-        //     toDecrypt(member);
-        // });
+        realtimeInflowCafe24Member[0].forEach(member => {
+            toDecrypt(member);
+        });
 
         return realtimeInflowCafe24Member;
     } catch (error) {
