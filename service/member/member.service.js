@@ -103,13 +103,27 @@ const getSearchClause = function (pageRequest) {
 }
 
 function toDecrypt(data) {
-    console.log(data, '멤버 데이터')
+    //console.log(data, '멤버 데이터')
+    const algorithm = 'aes-128-ecb'; // AES-128-ECB 사용
+    const encryptKey = 'realcocorealcoco'; // 키
+    function decrypt(dbData) {
+        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptKey, 'utf-8'), null);
+        let decrypted;
 
-    //data.name = decrypt(data.name);
-    //data.cellPhone = decrypt(data.cellPhone);
+        try {
+            decrypted = decipher.update(dbData, 'base64', 'utf-8');
+            decrypted += decipher.final('utf-8');
+            return decrypted;
+        } catch (error) {
+            return null; // 복호화 실패 시 null 반환
+        }
+    }
 
-    data.name = (data.name);
-    data.cellPhone = (data.cellPhone);
+    data.name = decrypt(data.name);
+    data.cellPhone = decrypt(data.cellPhone);
+
+    //data.name = (data.name);
+    //data.cellPhone = (data.cellPhone);
 
     return data;
 }
