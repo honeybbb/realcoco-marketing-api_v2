@@ -304,3 +304,86 @@ exports.findTop1ByOrderByCreatedAtDesc = async function () {
         return {'data': '-9999'}
     }
 }
+
+exports.getZigzagSellData = async function (resData, type, date) {
+    let sql = "INSERT INTO ZigzagSellData (order_no, product_no, type, date) VALUES (?, ?, ?, ?)";
+    let results = [];
+
+    try {
+        for (let i = 0; i < resData.length; i++) {
+            let aParameter = [resData[i]['상품주문번호'], resData[i]['상품번호'], type, date]; // resData 요소에 따라 변경
+            let query = mysql.format(sql, aParameter);
+            let res = await pool.query(query);
+            results.push(res[0]); // 결과를 배열에 추가
+        }
+        return results; // 모든 결과 반환
+    } catch (e) {
+        console.log('db err', e);
+        return { 'data': '-9999' };
+    }
+}
+
+exports.getZigzagData = async function () {
+    let sql = "select *, DATE_FORMAT(date, '%Y-%m-%d') as `orderDt`"
+    sql += " from ZigzagSellData"
+    sql += " order by date desc"
+    let aParameter = [];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagIncrease = async function (shopId, date) {
+    let sql = "select increase.*"
+    sql += " from (SELECT p3.product_no, p3.count_3_days_ago, p4.count_4_days_ago"
+    sql += " FROM"
+    sql += " (SELECT product_no, COUNT(*) AS count_3_days_ago"
+    sql += " FROM ZigzagSellData"
+    sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    sql += " GROUP BY product_no) p3" //해당날짜 직전 3일전의 판매 데이터
+    sql += " JOIN"
+    sql += " (SELECT product_no, COUNT(*) AS count_4_days_ago"
+    sql += " FROM ZigzagSellData"
+    sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    sql += " GROUP BY product_no) p4" //해당날짜 직직전 4일전의 판매 데이터
+    sql += " ON p3.product_no = p4.product_no"
+    sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " limit 20"
+
+    let aParameter = [date, date];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagGragh = async function (shopId, productNos) {
+    let sql = "select product_no,"
+    sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
+    sql += " COUNT(*) as `orderEa`";
+    sql += " from ZigzagSellData"
+    sql += " where product_no in (?)"
+    sql += " group by product_no, orderDt"
+
+    let aParameter = [productNos];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}

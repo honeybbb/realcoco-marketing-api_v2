@@ -542,3 +542,27 @@ exports.deleteProductsBestExcludeAll =  async function (shopId, date) {
 
     return result
 }
+
+exports.getZigzagSellData = async function (jsonData) {
+    let result = await productModel.getZigzagSellData(jsonData);
+
+    return result;
+}
+
+exports.getZigzagData = async function (shopId) {
+    let result = await productModel.getZigzagData(shopId);
+    return result;
+}
+
+exports.getZigzagIncrease = async function (shopId, date) {
+    let result = await productModel.getZigzagIncrease(shopId, date);
+    result = result.map((a) => a.product_no)
+
+    return result;
+}
+
+exports.getZigzagGragh = async function (shopId, productNos) {
+    let result = await productModel.getZigzagGragh(shopId, productNos);
+
+    return result;
+}
