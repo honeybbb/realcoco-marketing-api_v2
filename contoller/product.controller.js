@@ -181,6 +181,7 @@ module.exports = function (app) {
         });
 
         form.on('close', async () => {
+            console.log(type, date, 'd')
             let cData = [];
 
             if(!heardesList.includes('상품주문번호')) {
@@ -230,6 +231,8 @@ module.exports = function (app) {
 
         let result = await productService.getZigzagData(shopId);
 
+        //console.log(result, 'result')
+
         res.json({ 'result': true, 'data': result });
     })
 
@@ -239,6 +242,8 @@ module.exports = function (app) {
 
         let result = await productService.getZigzagIncrease(shopId, date);
 
+        //console.log(result, 'result')
+
         res.json({ 'result': true, 'data': result });
     })
 
@@ -247,6 +252,8 @@ module.exports = function (app) {
         const productNos = req.query.productNos;
 
         let result = await productService.getZigzagGragh(shopId, productNos);
+
+        //console.log(result, 'result')
 
         res.json({ 'result': true, 'data': result });
     })
