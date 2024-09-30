@@ -306,12 +306,12 @@ exports.findTop1ByOrderByCreatedAtDesc = async function () {
 }
 
 exports.getZigzagSellData = async function (resData, type, date) {
-    let sql = "INSERT INTO ZigzagSellData (order_no, product_no, type, date) VALUES (?, ?, ?, ?)";
+    let sql = "INSERT INTO ZigzagSellData (order_no, product_no, product_name, type, date) VALUES (?, ?, ?, ?, ?)";
     let results = [];
 
     try {
         for (let i = 0; i < resData.length; i++) {
-            let aParameter = [resData[i]['상품주문번호'], resData[i]['상품번호'], type, date]; // resData 요소에 따라 변경
+            let aParameter = [resData[i]['상품주문번호'], resData[i]['상품번호'], resData[i]['상품명'], type, date]; // resData 요소에 따라 변경
             let query = mysql.format(sql, aParameter);
             let res = await pool.query(query);
             results.push(res[0]); // 결과를 배열에 추가
@@ -370,13 +370,36 @@ exports.getZigzagIncrease = async function (shopId, date) {
 
 exports.getZigzagGragh = async function (shopId, productNos) {
     let sql = "select product_no,"
+    sql += " product_name,"
+    //sql += " (select product_name from ZigzagSellData sub where sub.product_no = product_no limit 1) as `product_name`,"
     sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
     sql += " COUNT(*) as `orderEa`";
     sql += " from ZigzagSellData"
     sql += " where product_no in (?)"
+    sql += " group by product_no, orderDt, product_name";
+    /*
+    let sql = "select product_no,"
+    sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
+    sql += " COUNT(*) as `orderEa` from ZigzagSellData"
+    sql += " where product_no in (?)"
     sql += " group by product_no, orderDt"
+     */
 
     let aParameter = [productNos];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.deleteZigzagData = async function (orderNo) {
+    let sql = "delete from ZigzagSellData where order_no in (?)";
+    let aParameter = [orderNo];
 
     let query = mysql.format(sql, aParameter);
     try {

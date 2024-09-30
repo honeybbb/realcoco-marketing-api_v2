@@ -111,8 +111,7 @@ module.exports = function (app) {
 
     app.post('/api/v1/:shopId/products/zigzag/excel', async function (req, res) {
         const shopId = req.params.shopId;
-        const type = req.body.type;
-        const date = req.body.date;
+        let type, date;
 
         let resData = [];
         let heardesList = [];
@@ -120,6 +119,11 @@ module.exports = function (app) {
 
         const form = new multiparty.Form({
             autoFiles: true,
+        });
+
+        form.on('field', (name, value) => {
+            if (name == 'type') type = value;
+            if (name == 'date') date = value;
         });
 
         form.on('file', (name, file) => {
@@ -226,8 +230,6 @@ module.exports = function (app) {
 
         let result = await productService.getZigzagData(shopId);
 
-        console.log(result, 'result')
-
         res.json({ 'result': true, 'data': result });
     })
 
@@ -236,8 +238,6 @@ module.exports = function (app) {
         const date = req.query.date;
 
         let result = await productService.getZigzagIncrease(shopId, date);
-
-        console.log(result, 'result')
 
         res.json({ 'result': true, 'data': result });
     })
@@ -248,8 +248,14 @@ module.exports = function (app) {
 
         let result = await productService.getZigzagGragh(shopId, productNos);
 
-        console.log(result, 'result')
+        res.json({ 'result': true, 'data': result });
+    })
 
+    app.delete('/api/v1/:shopId/products/zigzag/excel', async function (req, res) {
+        const shopId = req.params.shopId;
+        const orderNos = req.query.orderNos;
+
+        let result = await productService.deleteZigzagData(shopId, orderNos);
         res.json({ 'result': true, 'data': result });
     })
 }
