@@ -227,13 +227,17 @@ module.exports = function (app) {
 
     app.get('/api/v1/:shopId/products/zigzag/excel', async function (req, res) {
         const shopId = req.params.shopId;
-        const date = req.query.date;
+        const date = req.query.date,
+            page = req.query.page,
+            size = req.query.size;
+        //console.log(page, size, 'controller')
+        let result = await productService.getZigzagData(shopId, page, size);
+        let cntRes = await productService.getZigzagTotalCnt();
 
-        let result = await productService.getZigzagData(shopId);
 
         //console.log(result, 'result')
 
-        res.json({ 'result': true, 'data': result });
+        res.json({ 'result': true, 'data': result, 'total': cntRes });
     })
 
     app.get('/api/v1/:shopId/products/zigzag/increase', async function (req, res) {

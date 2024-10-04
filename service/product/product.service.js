@@ -548,9 +548,13 @@ exports.getZigzagSellData = async function (jsonData, type, date) {
 
     return result;
 }
+exports.getZigzagTotalCnt = async function () {
+    let result = await productModel.getZigzagTotalCnt();
+    return result;
+}
 
-exports.getZigzagData = async function (shopId) {
-    let result = await productModel.getZigzagData(shopId);
+exports.getZigzagData = async function (shopId, page, size) {
+    let result = await productModel.getZigzagData(shopId, page, size);
     return result;
 }
 

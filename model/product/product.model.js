@@ -323,16 +323,37 @@ exports.getZigzagSellData = async function (resData, type, date) {
     }
 }
 
-exports.getZigzagData = async function () {
+exports.getZigzagData = async function (shopId, page, size) {
+    page = parseInt(page) || 1
+    size = parseInt(size)
+    const offset = (page - 1) * size; // 시작 오프셋 계산
     let sql = "select *, DATE_FORMAT(date, '%Y-%m-%d') as `orderDt`"
     sql += " from ZigzagSellData"
     sql += " order by date desc"
+    sql += " limit "+offset+", "+size
+    let aParameter = [page, size, size];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+       let res = await pool.query(query);
+       return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagTotalCnt = async function () {
+    let sql = "select COUNT(*) as `cnt`"
+    sql += " from ZigzagSellData"
+    sql += " order by date desc"
+
     let aParameter = [];
 
     let query = mysql.format(sql, aParameter);
     try {
         let res = await pool.query(query);
-        return res;
+        return res[0];
     }catch (e) {
         console.log('db err', e);
         return {'data': '-9999'}
