@@ -410,7 +410,7 @@ exports.getZigzagSalesTrend = async function (shopId, date) {
     }
 }
 
-exports.getZigzagGragh = async function (shopId, productNos) {
+exports.getZigzagGragh = async function (shopId, productNos, date) {
     let sql = "select product_no,"
     sql += " product_name,"
     //sql += " (select product_name from ZigzagSellData sub where sub.product_no = product_no limit 1) as `product_name`,"
@@ -418,7 +418,8 @@ exports.getZigzagGragh = async function (shopId, productNos) {
     sql += " COUNT(*) as `orderEa`";
     sql += " from ZigzagSellData"
     sql += " where product_no in (?)"
-    sql += " AND `date` >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"
+    //sql += " AND `date` >= DATE_SUB((?), INTERVAL 7 DAY)"
+    sql += " AND `date` BETWEEN DATE_SUB(?, INTERVAL 7 DAY) AND (?) "
     sql += " group by product_no, orderDt, product_name";
     /*
     let sql = "select product_no,"
@@ -428,7 +429,7 @@ exports.getZigzagGragh = async function (shopId, productNos) {
     sql += " group by product_no, orderDt"
      */
 
-    let aParameter = [productNos];
+    let aParameter = [productNos, date, date];
 
     let query = mysql.format(sql, aParameter);
     try {

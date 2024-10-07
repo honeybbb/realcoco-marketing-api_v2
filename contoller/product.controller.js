@@ -265,8 +265,9 @@ module.exports = function (app) {
     app.get('/api/v1/:shopId/products/zigzag/gragh', async function (req, res) {
         const shopId = req.params.shopId;
         const productNos = req.query.productNos;
+        const date = req.query.date;
 
-        let result = await productService.getZigzagGragh(shopId, productNos);
+        let result = await productService.getZigzagGragh(shopId, productNos, date);
 
         //console.log(result, 'result')
 

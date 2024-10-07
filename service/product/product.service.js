@@ -572,8 +572,8 @@ exports.getZigzagSalesTrend = async function (shopId, date) {
     return result;
 }
 
-exports.getZigzagGragh = async function (shopId, productNos) {
-    let result = await productModel.getZigzagGragh(shopId, productNos);
+exports.getZigzagGragh = async function (shopId, productNos, date) {
+    let result = await productModel.getZigzagGragh(shopId, productNos, date);
 
     return result;
 }
