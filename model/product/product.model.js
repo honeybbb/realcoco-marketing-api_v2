@@ -418,6 +418,7 @@ exports.getZigzagGragh = async function (shopId, productNos) {
     sql += " COUNT(*) as `orderEa`";
     sql += " from ZigzagSellData"
     sql += " where product_no in (?)"
+    sql += " AND `date` >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"
     sql += " group by product_no, orderDt, product_name";
     /*
     let sql = "select product_no,"
