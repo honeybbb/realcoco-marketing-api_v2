@@ -362,7 +362,8 @@ exports.getZigzagTotalCnt = async function () {
 
 exports.getZigzagIncrease = async function (shopId, date) {
     let sql = "select increase.*"
-    sql += " from (SELECT p3.product_no, p3.count_3_days_ago, p4.count_4_days_ago"
+    sql += " from (SELECT p3.product_no, p3.count_3_days_ago, p4.count_4_days_ago,"
+    sql += " (p3.count_3_days_ago - p4.count_4_days_ago) AS increase_amount"
     sql += " FROM"
     sql += " (SELECT product_no, COUNT(*) AS count_3_days_ago"
     sql += " FROM ZigzagSellData"
@@ -375,9 +376,29 @@ exports.getZigzagIncrease = async function (shopId, date) {
     sql += " GROUP BY product_no) p4" //해당날짜 직직전 4일전의 판매 데이터
     sql += " ON p3.product_no = p4.product_no"
     sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " ORDER BY increase_amount DESC"
     sql += " limit 20"
 
     let aParameter = [date, date];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagSalesTrend = async function (shopId, date) {
+    let sql = "select product_no, COUNT(*) as `orderEa`"
+    sql += " from ZigzagSellData"
+    sql += " where date = (?) - INTERVAL 1 DAY"
+    sql += " group by product_no"
+    sql += " HAVING orderEa >= 5"
+    sql += " order by orderEa desc"
+    let aParameter = [date];
 
     let query = mysql.format(sql, aParameter);
     try {

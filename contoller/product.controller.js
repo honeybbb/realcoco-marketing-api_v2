@@ -251,6 +251,17 @@ module.exports = function (app) {
         res.json({ 'result': true, 'data': result });
     })
 
+    app.get('/api/v1/:shopId/products/zigzag/trend', async function (req, res) {
+        const shopId = req.params.shopId;
+        const date = req.query.date;
+
+        let result = await productService.getZigzagSalesTrend(shopId, date);
+
+        //console.log(result, 'sales trend products')
+
+        res.json({ 'result': true, 'data': result });
+    })
+
     app.get('/api/v1/:shopId/products/zigzag/gragh', async function (req, res) {
         const shopId = req.params.shopId;
         const productNos = req.query.productNos;
