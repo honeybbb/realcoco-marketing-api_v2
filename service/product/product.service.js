@@ -565,8 +565,8 @@ exports.getZigzagIncrease = async function (shopId, date) {
     return result;
 }
 
-exports.getZigzagSalesTrend = async function (shopId, date) {
-    let result = await productModel.getZigzagSalesTrend(shopId, date);
+exports.getZigzagSalesTrend = async function (shopId, date, type) {
+    let result = await productModel.getZigzagSalesTrend(shopId, date, type);
     result = result.map((a) => a.product_no)
 
     return result;

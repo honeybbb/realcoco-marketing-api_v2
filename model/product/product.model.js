@@ -391,14 +391,15 @@ exports.getZigzagIncrease = async function (shopId, date) {
     }
 }
 
-exports.getZigzagSalesTrend = async function (shopId, date) {
+exports.getZigzagSalesTrend = async function (shopId, date, type) {
     let sql = "select product_no, COUNT(*) as `orderEa`"
     sql += " from ZigzagSellData"
     sql += " where date = (?) - INTERVAL 1 DAY"
+    sql += " and type in (?)"
     sql += " group by product_no"
     sql += " HAVING orderEa >= 5"
     sql += " order by orderEa desc"
-    let aParameter = [date];
+    let aParameter = [date, type];
 
     let query = mysql.format(sql, aParameter);
     try {

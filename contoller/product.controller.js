@@ -254,8 +254,11 @@ module.exports = function (app) {
     app.get('/api/v1/:shopId/products/zigzag/trend', async function (req, res) {
         const shopId = req.params.shopId;
         const date = req.query.date;
+        const type = req.query.type;
 
-        let result = await productService.getZigzagSalesTrend(shopId, date);
+        console.log(date, 'date', type, 'type')
+
+        let result = await productService.getZigzagSalesTrend(shopId, date, type);
 
         //console.log(result, 'sales trend products')
 
