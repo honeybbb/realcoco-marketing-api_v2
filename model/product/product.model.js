@@ -361,6 +361,7 @@ exports.getZigzagTotalCnt = async function () {
 }
 
 exports.getZigzagIncrease = async function (shopId, date) {
+    /*
     let sql = "select increase.*"
     sql += " from (SELECT p3.product_no, p3.count_3_days_ago, p4.count_4_days_ago,"
     sql += " (p3.count_3_days_ago - p4.count_4_days_ago) AS increase_amount"
@@ -375,6 +376,25 @@ exports.getZigzagIncrease = async function (shopId, date) {
     sql += " WHERE date = (?) - INTERVAL 4 DAY"
     sql += " GROUP BY product_no) p4" //해당날짜 직직전 4일전의 판매 데이터
     sql += " ON p3.product_no = p4.product_no"
+    sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " ORDER BY increase_amount DESC"
+    sql += " limit 20"
+
+     */
+    let sql = "select increase.*"
+    sql += " from (SELECT p3.product_name, p3.count_3_days_ago, p4.count_4_days_ago,"
+    sql += " (p3.count_3_days_ago - p4.count_4_days_ago) AS increase_amount"
+    sql += " FROM"
+    sql += " (SELECT product_name, COUNT(*) AS count_3_days_ago"
+    sql += " FROM ZigzagSellData"
+    sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    sql += " GROUP BY product_name) p3" //해당날짜 직전 3일전의 판매 데이터
+    sql += " JOIN"
+    sql += " (SELECT product_name, COUNT(*) AS count_4_days_ago"
+    sql += " FROM ZigzagSellData"
+    sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    sql += " GROUP BY product_name) p4" //해당날짜 직직전 4일전의 판매 데이터
+    sql += " ON p3.product_name = p4.product_name"
     sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
     sql += " ORDER BY increase_amount DESC"
     sql += " limit 20"
@@ -412,23 +432,30 @@ exports.getZigzagSalesTrend = async function (shopId, date, type) {
 }
 
 exports.getZigzagGragh = async function (shopId, productNos, date) {
+    /*
     let sql = "select product_no,"
     sql += " product_name,"
-    //sql += " (select product_name from ZigzagSellData sub where sub.product_no = product_no limit 1) as `product_name`,"
     sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
     sql += " COUNT(*) as `orderEa`";
     sql += " from ZigzagSellData"
-    sql += " where product_no in (?)"
-    //sql += " AND `date` >= DATE_SUB((?), INTERVAL 7 DAY)"
+    sql += " where product_name in (?)"
     sql += " AND `date` BETWEEN DATE_SUB(?, INTERVAL 7 DAY) AND (?) "
     sql += " group by product_no, orderDt, product_name";
-    /*
-    let sql = "select product_no,"
-    sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
-    sql += " COUNT(*) as `orderEa` from ZigzagSellData"
-    sql += " where product_no in (?)"
-    sql += " group by product_no, orderDt"
+
      */
+    let sql = "select date, product_name,"
+    sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
+    sql += " COUNT(*) as `totalEa`,"
+    sql += " CONCAT('[',"
+    sql += " GROUP_CONCAT(DISTINCT JSON_OBJECT("
+    sql += " 'type', type,"
+    sql += " 'directEa', (select COUNT(*) from ZigzagSellData dz where dz.product_name = main.product_name and dz.date = main.date and dz.type = 'direct'),"
+    sql += " 'storeEa', (select COUNT(*) from ZigzagSellData dz where dz.product_name = main.product_name and dz.date = main.date and dz.type = 'store')"
+    sql += " )),"
+    sql += " ']') as `data`"
+    sql += " from ZigzagSellData main"
+    sql += " where product_name in (?)"
+    sql += " group by date, product_name"
 
     let aParameter = [productNos, date, date];
 

@@ -544,7 +544,24 @@ exports.deleteProductsBestExcludeAll =  async function (shopId, date) {
 }
 
 exports.getZigzagSellData = async function (jsonData, type, date) {
-    let result = await productModel.getZigzagSellData(jsonData, type, date);
+    let newData = []; //새로 전처리된 데이터
+    //console.log(jsonData)
+    jsonData.forEach((product) => {
+        let productNm = product['상품명'];
+        while (productNm.includes(']')) {
+            productNm = productNm.match(/(?<=\])[^-()]+/g)?.map(name => name.trim())[0] || productNm;
+        }
+
+        const newProduct = {
+            ...product, // 기존의 모든 정보 복사
+            '상품명': productNm // 전처리된 상품명으로 업데이트
+        };
+
+        // 새로운 배열에 추가
+        newData.push(newProduct);
+    })
+
+    let result = await productModel.getZigzagSellData(newData, type, date);
 
     return result;
 }
@@ -560,7 +577,8 @@ exports.getZigzagData = async function (shopId, page, size) {
 
 exports.getZigzagIncrease = async function (shopId, date) {
     let result = await productModel.getZigzagIncrease(shopId, date);
-    result = result.map((a) => a.product_no)
+    result = result.map((a) => a.product_name)
+    console.log(result)
 
     return result;
 }
