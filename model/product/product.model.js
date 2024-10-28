@@ -455,6 +455,7 @@ exports.getZigzagGragh = async function (shopId, productNos, date) {
     sql += " ']') as `data`"
     sql += " from ZigzagSellData main"
     sql += " where product_name in (?)"
+    sql += " and date BETWEEN DATE_ADD(?, INTERVAL -7 DAY) AND ?"
     sql += " group by date, product_name"
 
     let aParameter = [productNos, date, date];
