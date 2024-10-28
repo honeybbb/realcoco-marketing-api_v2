@@ -443,6 +443,7 @@ exports.getZigzagGragh = async function (shopId, productNos, date) {
     sql += " group by product_no, orderDt, product_name";
 
      */
+    /*
     let sql = "select date, product_name,"
     sql += " DATE_FORMAT(`date`, '%Y-%m-%d') as `orderDt`,"
     sql += " COUNT(*) as `totalEa`,"
@@ -458,7 +459,27 @@ exports.getZigzagGragh = async function (shopId, productNos, date) {
     sql += " and date BETWEEN DATE_ADD(?, INTERVAL -7 DAY) AND ?"
     sql += " group by date, product_name"
 
-    let aParameter = [productNos, date, date];
+     */
+    console.log(productNos, date)
+    let sql = "select main.date, main.product_name,"
+    sql += " DATE_FORMAT(main.date, '%Y-%m-%d') AS orderDt,"
+    sql += " COUNT(*) AS totalEa,"
+    sql += " CONCAT('[', GROUP_CONCAT(DISTINCT JSON_OBJECT("
+    sql += " 'type', type, 'directEa', directEa, 'storeEa', storeEa)), ']') as data"
+    sql += " from ZigzagSellData main"
+    sql += " LEFT JOIN (SELECT date, product_name,"
+    sql += " SUM(CASE WHEN type = 'direct' THEN 1 ELSE 0 END) AS directEa,"
+    sql += " SUM(CASE WHEN type = 'store' THEN 1 ELSE 0 END) AS storeEa"
+    sql += " from ZigzagSellData"
+    sql += " where product_name in (?)"
+    sql += " AND date BETWEEN DATE_ADD(?, INTERVAL -7 DAY) AND ?"
+    sql += " GROUP BY date, product_name"
+    sql += ") AS sub ON main.date = sub.date AND main.product_name = sub.product_name"
+    sql += " where main.product_name in (?)"
+    sql += " AND main.date BETWEEN DATE_ADD(?, INTERVAL -7 DAY) AND ?"
+    sql += " group by main.date, main.product_name";
+
+    let aParameter = [productNos, date, date, productNos, date, date];
 
     let query = mysql.format(sql, aParameter);
     try {
