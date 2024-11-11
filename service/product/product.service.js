@@ -583,6 +583,22 @@ exports.getZigzagIncrease = async function (shopId, date) {
     return result;
 }
 
+exports.getZigzagIncreaseChallenger = async function (shopId, date) {
+    let result = await productModel.getZigzagIncreaseChallenger(shopId, date);
+    result = result.map((a) => a.product_name)
+    console.log(result)
+
+    return result;
+}
+
+exports.getZigzagIncreaseRising = async function (shopId, date) {
+    let result = await productModel.getZigzagIncreaseRising(shopId, date);
+    result = result.map((a) => a.product_name)
+    console.log(result)
+
+    return result;
+}
+
 exports.getZigzagSalesTrend = async function (shopId, date, type) {
     let result = await productModel.getZigzagSalesTrend(shopId, date, type);
     result = result.map((a) => a.product_no)

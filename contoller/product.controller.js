@@ -251,6 +251,39 @@ module.exports = function (app) {
         res.json({ 'result': true, 'data': result });
     })
 
+    app.get('/api/v1/:shopId/products/zigzag/increase/challenger', async function (req, res) {
+        const shopId = req.params.shopId;
+        const date = req.query.date;
+
+        let result = await productService.getZigzagIncreaseChallenger(shopId, date);
+
+        //console.log(result, 'result')
+
+        res.json({ 'result': true, 'data': result });
+    })
+
+    app.get('/api/v1/:shopId/products/zigzag/increase/challenger', async function (req, res) {
+        const shopId = req.params.shopId;
+        const date = req.query.date;
+
+        let result = await productService.getZigzagIncreaseChallenger(shopId, date);
+
+        //console.log(result, 'result')
+
+        res.json({ 'result': true, 'data': result });
+    })
+
+    app.get('/api/v1/:shopId/products/zigzag/increase/rising', async function (req, res) {
+        const shopId = req.params.shopId;
+        const date = req.query.date;
+
+        let result = await productService.getZigzagIncreaseRising(shopId, date);
+
+        //console.log(result, 'result')
+
+        res.json({ 'result': true, 'data': result });
+    })
+
     app.get('/api/v1/:shopId/products/zigzag/trend', async function (req, res) {
         const shopId = req.params.shopId;
         const date = req.query.date;

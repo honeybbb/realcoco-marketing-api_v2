@@ -387,19 +387,90 @@ exports.getZigzagIncrease = async function (shopId, date) {
     sql += " FROM"
     sql += " (SELECT product_name, COUNT(*) AS count_3_days_ago"
     sql += " FROM ZigzagSellData"
-    sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    //sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 3 DAY AND (?) - INTERVAL 1 DAY"
     sql += " GROUP BY product_name) p3" //해당날짜 직전 3일전의 판매 데이터
     sql += " JOIN"
     sql += " (SELECT product_name, COUNT(*) AS count_4_days_ago"
     sql += " FROM ZigzagSellData"
-    sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    // sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 6 DAY AND (?) - INTERVAL 4 DAY"
     sql += " GROUP BY product_name) p4" //해당날짜 직직전 4일전의 판매 데이터
     sql += " ON p3.product_name = p4.product_name"
     sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " where count_3_days_ago >= 50"
     sql += " ORDER BY increase_amount DESC"
-    sql += " limit 20"
+    // sql += " limit 20"
 
-    let aParameter = [date, date];
+    let aParameter = [date, date, date, date];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagIncreaseChallenger = async function (shopId, date) {
+    let sql = "select increase.*"
+    sql += " from (SELECT p3.product_name, p3.count_3_days_ago, p4.count_4_days_ago,"
+    sql += " (p3.count_3_days_ago - p4.count_4_days_ago) AS increase_amount"
+    sql += " FROM"
+    sql += " (SELECT product_name, COUNT(*) AS count_3_days_ago"
+    sql += " FROM ZigzagSellData"
+    //sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 3 DAY AND (?) - INTERVAL 1 DAY"
+    sql += " GROUP BY product_name) p3" //해당날짜 직전 3일전의 판매 데이터
+    sql += " JOIN"
+    sql += " (SELECT product_name, COUNT(*) AS count_4_days_ago"
+    sql += " FROM ZigzagSellData"
+    // sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 6 DAY AND (?) - INTERVAL 4 DAY"
+    sql += " GROUP BY product_name) p4" //해당날짜 직직전 4일전의 판매 데이터
+    sql += " ON p3.product_name = p4.product_name"
+    sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " where count_3_days_ago between 10 and 49"
+    sql += " ORDER BY increase_amount DESC"
+    // sql += " limit 20"
+
+    let aParameter = [date, date, date, date];
+
+    let query = mysql.format(sql, aParameter);
+    try {
+        let res = await pool.query(query);
+        return res;
+    }catch (e) {
+        console.log('db err', e);
+        return {'data': '-9999'}
+    }
+}
+
+exports.getZigzagIncreaseRising = async function (shopId, date) {
+    let sql = "select increase.*"
+    sql += " from (SELECT p3.product_name, p3.count_3_days_ago, p4.count_4_days_ago,"
+    sql += " (p3.count_3_days_ago - p4.count_4_days_ago) AS increase_amount"
+    sql += " FROM"
+    sql += " (SELECT product_name, COUNT(*) AS count_3_days_ago"
+    sql += " FROM ZigzagSellData"
+    //sql += " WHERE date = (?) - INTERVAL 3 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 3 DAY AND (?) - INTERVAL 1 DAY"
+    sql += " GROUP BY product_name) p3" //해당날짜 직전 3일전의 판매 데이터
+    sql += " JOIN"
+    sql += " (SELECT product_name, COUNT(*) AS count_4_days_ago"
+    sql += " FROM ZigzagSellData"
+    // sql += " WHERE date = (?) - INTERVAL 4 DAY"
+    sql += " WHERE date BETWEEN (?) - INTERVAL 6 DAY AND (?) - INTERVAL 4 DAY"
+    sql += " GROUP BY product_name) p4" //해당날짜 직직전 4일전의 판매 데이터
+    sql += " ON p3.product_name = p4.product_name"
+    sql += " WHERE p3.count_3_days_ago > p4.count_4_days_ago * 1.1) as `increase`"
+    sql += " where count_3_days_ago < 10"
+    sql += " ORDER BY increase_amount DESC"
+    // sql += " limit 20"
+
+    let aParameter = [date, date, date, date];
 
     let query = mysql.format(sql, aParameter);
     try {
